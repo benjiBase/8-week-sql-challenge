@@ -19,5 +19,14 @@ SUM(price) as total_sum
 FROM dannys_diner.sales s
 INNER JOIN dannys_diner.menu m
 ON s.product_id = m.product_id
-GROUP BY 1;
+GROUP BY 1
+ORDER BY 1 ASC;
 ```
+**Remarks**
+1. Looking at ER diagram we know to do **JOIN** query as the customer_id and price is of different table 
+2. to get total we use **SUM** function and **GROUP BY 1** just means grouping by the **SELECT ORDER**
+   1. customer_id
+   2. SUM(price) as total_sum
+3. Finally **ORDER BY 1 ASC** is just sorting it by customer in Ascending order as **JOIN** scrambles the row to make the query run faster
+![image](https://github.com/benjiBase/8-week-sql-challenge/assets/70194504/829c5f76-cff2-42f7-8b28-45faf93cac9d)
+ 
