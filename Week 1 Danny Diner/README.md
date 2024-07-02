@@ -32,6 +32,7 @@ ORDER BY 1 ASC;
    1. customer_id
    2. SUM(price) as total_sum
 3. Finally **ORDER BY 1 ASC** is just sorting it by customer in Ascending order as **JOIN** scrambles the row to make the query run faster
+***
 
 **2. How many days has each customer visited the restaurant?**
 ```sql
@@ -50,28 +51,68 @@ GROUP BY 1
    3. Hence we use the keyword DISTINCT that only return 1 unique entry of any particular date
 2. **GROUP BY** is **needed** because when **COUNT/aggregate functions of SQL** requires us base it of a certain grouping logic
    1. else u see a warning like ```ERROR:  column "sales.customer_id" must appear in the GROUP BY clause or be used in an aggregate function```
-
+***
 
 **3. What was the first item from the menu purchased by each customer?**
+```sql
+WITH cte AS(
+   SELECT
+   *,
+   ROW_NUMBER() OVER(PARTITION BY customer_id) as ranking
+   FROM sales
+)
 
+
+SELECT
+   cte.customer_id,
+   cte.ranking,
+   product_name
+FROM cte
+INNER JOIN menu m
+   ON cte.product_id = m.product_id
+ORDER BY 2
+LIMIT 3;
+```
+![image](https://github.com/benjiBase/8-week-sql-challenge/assets/70194504/5471343f-40c1-4738-abe6-317a90cdd6f4)
+
+**REMARKS**
+1. When dealing with anything with first item or questions with some form of ranking/ordering of queries look for window functions
+2. using Common Table Expression (CTE) provides better readability than subqueries won't improve much for **query performance**
+3. 
+***
 
 **4. What is the most purchased item on the menu and how many times was it purchased by all customers?**
 
+**REMARKS**
+***
 
 **5. Which item was the most popular for each customer?**
 
+**REMARKS**
+***
 
 **6. Which item was purchased first by the customer after they became a member?**
 
+**REMARKS**
+***
 
 **7. Which item was purchased just before the customer became a member?**
 
+**REMARKS**
+***
 
 **8. What is the total items and amount spent for each member before they became a member?**
 
+**REMARKS**
+***
 
 **9. If each $1 spent equates to 10 points and sushi has a 2x points multiplier - how many points would each customer have?**
 
+**REMARKS**
+***
 
 **10. In the first week after a customer joins the program (including their join date) they earn 2x points on all items, not just sushi - how many points do customer A and B have at the end of January?**
+
+**REMARKS**
+***
 
