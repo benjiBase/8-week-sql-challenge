@@ -11,4 +11,13 @@ You can visit [here] (https://8weeksqlchallenge.com/case-study-1/) to view the d
 
 ## Solution
 
-*1. What is the total amount each customer spent at the restaurant?
+**1. What is the total amount each customer spent at the restaurant?**
+
+```SQL
+SELECT customer_id,
+SUM(price) as total_sum
+FROM dannys_diner.sales s
+INNER JOIN dannys_diner.menu m
+ON s.product_id = m.product_id
+GROUP BY 1;
+```
