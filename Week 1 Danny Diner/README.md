@@ -82,13 +82,87 @@ LIMIT 3;
 ***
 
 **4. What is the most purchased item on the menu and how many times was it purchased by all customers?**
+```sql
+SELECT
+  menu.product_name,
+  COUNT(sales.product_id) AS order_count
+FROM sales
+INNER JOIN menu
+  ON sales.product_id = menu.product_id
+GROUP BY
+  menu.product_name
+ORDER BY order_count DESC
+LIMIT 1;
+```
+![image](https://github.com/benjiBase/8-week-sql-challenge/assets/70194504/f20b6bba-3953-4b1a-8fd2-2b27de7d3605)
 
 **REMARKS**
+1. to **join** sales and menu in order to do some form of counting
+2. we group by 1 because we want to count based on product_name to see which is most popular
+3. finally we **LIMIT 1** because we just want most popular item
 ***
 
 **5. Which item was the most popular for each customer?**
+```sql
+WITH cte AS(
+SELECT 
+	customer_id,
+	product_id,
+	COUNT(product_id) as total_pop_item
+FROM sales 
+GROUP BY 1,2
+ORDER BY 1,2)
+
+SELECT 
+	new_cte.customer_id,
+	new_cte.product_id,
+   new_cte.total_pop_item,
+	m.product_name
+FROM(
+	SELECT
+  		customer_id,
+  		product_id,
+  		total_pop_item,
+		RANK() OVER(PARTITION by customer_id ORDER BY total_pop_item desc) as pos
+	FROM cte
+) as new_cte
+	
+INNER JOIN menu m
+	ON new_cte.product_id=m.product_id
+WHERE pos = 1
+ORDER BY 1
+```
+OR
+```sql
+WITH cte AS(
+SELECT 
+	customer_id,
+	product_id,
+	COUNT(product_id) as total_pop_item,
+	RANK() OVER(PARTITION by customer_id ORDER BY COUNT(product_id) desc) as pos
+FROM sales 
+GROUP BY 1,2
+ORDER BY 1,2)
+
+SELECT 
+	cte.customer_id,
+	cte.product_id,
+	cte.total_pop_item,
+	m.product_name
+FROM cte
+INNER JOIN menu m
+	ON cte.product_id=m.product_id
+WHERE pos = 1
+ORDER BY 1
+```
+![image](https://github.com/benjiBase/8-week-sql-challenge/assets/70194504/93c32bf0-a744-405f-ba34-d1d7d99c6918)
 
 **REMARKS**
+1. You cannot reference a column alias (an "output column") at the same level of a SELECT. You need a subselect or a CTE for this.
+2. The reason why we cannot use **WHERE immediately** with window function at same SELECT level is due to THE ORDER OF EXECUTION LAW for SQL
+3. so in our case we want to use **ORDER BY aliasing** we are forced to make a subquery of CTE otherwise we need to manually copy paste that **COUNT(product_id)**
+4. Preference is up to individual. As for **more complicated order by logic** a subquery will better for now its a simple  **COUNT(product_id)**
+
 ***
 
 **6. Which item was purchased first by the customer after they became a member?**
